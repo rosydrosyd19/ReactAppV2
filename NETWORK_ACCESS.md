@@ -145,10 +145,104 @@ Buka browser dan akses:
 
 **Tanpa Nginx (Development/Testing):**
 - Backend API: `http://192.168.1.100:5000/api/health`
-- Frontend: Tidak bisa diakses (React dev server hanya localhost)
+- Frontend: Lihat section "Frontend Development Mode" di bawah
 
 **Dengan Nginx (Production):**
 - Aplikasi lengkap: `http://192.168.1.100`
+
+---
+
+## 💻 Frontend Development Mode (Akses dari Network)
+
+Jika Anda ingin menjalankan **frontend dalam mode development** dan bisa diakses dari PC lain:
+
+### Opsi A: Menggunakan Script Network (Recommended)
+
+Frontend sudah dilengkapi dengan script khusus untuk network access.
+
+**1. Update Frontend .env:**
+
+```bash
+cd ~/ReactAppV2/frontend
+
+# Ganti dengan IP server Anda
+cat > .env << EOF
+REACT_APP_API_URL=http://192.168.1.100:5000/api
+EOF
+```
+
+**2. Buka Port Frontend (3000):**
+
+```bash
+sudo ufw allow 3000/tcp
+sudo ufw reload
+```
+
+**3. Jalankan Frontend dengan Network Mode:**
+
+```bash
+cd ~/ReactAppV2/frontend
+npm run start:network
+```
+
+**4. Akses dari PC Lain:**
+
+Buka browser di PC lain dan akses:
+- `http://192.168.1.100:3000`
+
+> ✅ **Keuntungan:** Hot reload tetap berfungsi, cocok untuk development dan testing.
+
+### Opsi B: Manual dengan Environment Variable
+
+Jika script di atas tidak bekerja, gunakan cara manual:
+
+```bash
+cd ~/ReactAppV2/frontend
+
+# Linux/Mac
+HOST=0.0.0.0 npm start
+
+# Atau export dulu
+export HOST=0.0.0.0
+npm start
+```
+
+### Opsi C: Menggunakan File .env.local
+
+Buat file `.env.local` di folder frontend:
+
+```bash
+cd ~/ReactAppV2/frontend
+
+cat > .env.local << EOF
+HOST=0.0.0.0
+REACT_APP_API_URL=http://192.168.1.100:5000/api
+EOF
+
+npm start
+```
+
+### ⚠️ Catatan Penting untuk Development Mode
+
+1. **Port 3000 harus dibuka** di firewall
+2. **Backend juga harus berjalan** di port 5000
+3. **CORS harus dikonfigurasi** dengan benar di backend
+4. **Untuk production**, gunakan `npm run build` + Nginx (lebih aman dan cepat)
+
+### Test Akses Development Mode
+
+**Dari Server:**
+```bash
+# Test frontend
+curl http://localhost:3000
+
+# Test dari network IP
+curl http://192.168.1.100:3000
+```
+
+**Dari PC Lain:**
+- Buka browser: `http://192.168.1.100:3000`
+- Anda akan melihat aplikasi React dengan hot reload aktif
 
 ---
 
@@ -287,15 +381,25 @@ sudo systemctl restart nginx
 
 ## ✅ Checklist
 
+**Untuk Production Mode (Nginx):**
 - [ ] IP address server sudah dicatat
 - [ ] Backend dikonfigurasi listen di `0.0.0.0`
 - [ ] Frontend `.env` sudah diupdate dengan IP server
-- [ ] Frontend sudah di-rebuild
+- [ ] Frontend sudah di-rebuild (`npm run build`)
 - [ ] Firewall sudah dikonfigurasi (port 5000 dan 80)
 - [ ] Backend sudah direstart
 - [ ] Nginx sudah direstart
 - [ ] Test akses dari server berhasil
 - [ ] Test akses dari PC lain berhasil
+
+**Untuk Development Mode (Frontend + Backend):**
+- [ ] IP address server sudah dicatat
+- [ ] Backend dikonfigurasi listen di `0.0.0.0`
+- [ ] Frontend `.env` sudah diupdate dengan IP server
+- [ ] Firewall sudah dikonfigurasi (port 3000, 5000)
+- [ ] Backend berjalan (`npm start`)
+- [ ] Frontend berjalan (`npm run start:network`)
+- [ ] Test akses dari PC lain ke port 3000 berhasil
 
 ---
 
