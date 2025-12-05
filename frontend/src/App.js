@@ -5,6 +5,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
+import AssetForm from './pages/AssetForm';
 
 function App() {
     return (
@@ -25,6 +26,22 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Assets />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/assets/new"
+                        element={
+                            <PrivateRoute>
+                                <AssetForm />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/assets/edit/:id"
+                        element={
+                            <PrivateRoute>
+                                <AssetForm />
                             </PrivateRoute>
                         }
                     />
