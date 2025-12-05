@@ -58,9 +58,10 @@ const startServer = async () => {
             process.exit(1);
         }
 
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`\n🚀 Server is running on port ${PORT}`);
-            console.log(`📍 API URL: http://localhost:${PORT}/api`);
+            console.log(`📍 Local API URL: http://localhost:${PORT}/api`);
+            console.log(`🌐 Network API URL: http://<your-server-ip>:${PORT}/api`);
             console.log(`🏥 Health check: http://localhost:${PORT}/api/health\n`);
         });
 

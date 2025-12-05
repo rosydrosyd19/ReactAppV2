@@ -94,7 +94,7 @@ npm install
 
 # Buat file .env jika belum ada
 cat > .env << EOF
-DB_HOST=localhost
+DB_HOST=127.0.0.1
 DB_USER=rosyd
 DB_PASSWORD=rosyd1298
 DB_NAME=asset_management
@@ -154,6 +154,81 @@ npm start
 ```
 
 Akses aplikasi di: `http://localhost:3000`
+
+> **⚠️ Catatan:** Mode development hanya bisa diakses dari localhost. Untuk akses dari PC lain, gunakan Opsi 2 atau 3.
+
+### 🌐 Akses dari PC Lain dalam Jaringan (LAN)
+
+Untuk mengakses aplikasi dari PC lain dalam jaringan yang sama:
+
+#### 1. Cek IP Address Server
+
+```bash
+# Cek IP address server Debian
+ip addr show | grep "inet "
+# atau
+hostname -I
+```
+
+Contoh output: `192.168.1.100`
+
+#### 2. Konfigurasi Backend untuk Network Access
+
+Edit file backend untuk listen di semua network interface:
+
+```bash
+cd ~/ReactAppV2/backend
+nano server.js
+```
+
+Cari baris yang berisi `app.listen` dan pastikan seperti ini:
+
+```javascript
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});
+```
+
+> **Penting:** Tambahkan `'0.0.0.0'` sebagai parameter kedua agar backend bisa diakses dari network.
+
+#### 3. Update Frontend .env
+
+```bash
+cd ~/ReactAppV2/frontend
+
+# Ganti localhost dengan IP server Anda
+cat > .env << EOF
+REACT_APP_API_URL=http://192.168.1.100:5000/api
+EOF
+
+# Rebuild frontend
+npm run build
+```
+
+> **Ganti `192.168.1.100`** dengan IP address server Debian Anda.
+
+#### 4. Konfigurasi Firewall
+
+```bash
+# Allow port 5000 (backend) dan 80 (nginx)
+sudo ufw allow 5000/tcp
+sudo ufw allow 80/tcp
+
+# Reload firewall
+sudo ufw reload
+```
+
+#### 5. Akses dari PC Lain
+
+Dari PC lain dalam jaringan yang sama, buka browser dan akses:
+
+**Jika menggunakan Development Mode:**
+- Backend: `http://192.168.1.100:5000`
+- Frontend: Tidak bisa diakses (hanya localhost)
+
+**Jika menggunakan Production Mode (Nginx):**
+- Aplikasi: `http://192.168.1.100`
 
 ### Opsi 2: Production Mode dengan PM2
 
